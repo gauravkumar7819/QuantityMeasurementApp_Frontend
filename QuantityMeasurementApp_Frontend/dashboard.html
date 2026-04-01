@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnitMaster - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <div class="dashboard-container">
+        <!-- Welcome Header -->
+        <section class="welcome-section">
+            <h1 id="welcomeUser">Welcome back!</h1>
+            <p>Ready for some precise measurements today?</p>
+        </section>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total Conversions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="recentType">-</div>
+                <div class="stat-label">Most Recent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">Active</div>
+                <div class="stat-label">Account Status</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="converter.html" class="action-card">
+                <div class="action-icon">🔄</div>
+                <div class="action-title">Start Converting</div>
+                <div class="action-desc">Convert between dozens of different measurement units.</div>
+            </a>
+            <a href="history.html" class="action-card">
+                <div class="action-icon">📊</div>
+                <div class="action-title">View History</div>
+                <div class="action-desc">Check your past conversions and performance stats.</div>
+            </a>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <div class="section-header">
+                <h2>Recent Activity</h2>
+                <a href="history.html" class="view-all">View All →</a>
+            </div>
+            <div class="activity-list" id="activityList">
+                <p style="text-align: center; color: #64748b; padding: 2rem;">Loading your activity...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        async function loadDashboardData() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return;
+
+            document.getElementById('welcomeUser').textContent = `Welcome back, ${user.name}!`;
+
+            let history = [];
+            try {
+                const res = await fetch(`${API_MEASUREMENTS}?userId=${user.id}&_sort=timestamp&_order=desc&_limit=5`);
+                if (res.ok) {
+                    history = await res.json();
+                } else {
+                    history = JSON.parse(localStorage.getItem('conversionHistory') || '[]').slice(0, 5);
+                }
+            } catch (error) {
+                console.error('Error fetching activity:', error);
+                history = JSON.parse(localStorage.getItem('conversionHistory') || '[]').slice(0, 5);
+            }
+
+            // Update Stats
+            document.getElementById('totalCount').textContent = history.length > 0 ? history.length : '0';
+            document.getElementById('recentType').textContent = history.length > 0 ? history[0].type.charAt(0).toUpperCase() + history[0].type.slice(1) : '-';
+
+            // Update Activity List
+            const activityList = document.getElementById('activityList');
+            if (history.length === 0) {
+                activityList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">No recent activity. Start converting!</p>';
+                return;
+            }
+
+            activityList.innerHTML = history.map(item => `
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <h4>${item.from} ${getOpSymbol(item.Operation)} ${item.to}</h4>
+                        <p>${new Date(item.timestamp).toLocaleString()}</p>
+                    </div>
+                    <div class="activity-result">${item.result}</div>
+                </div>
+            `).join('');
+        }
+
+        function getOpSymbol(op) {
+            const symbols = { CONVERT: '→', COMPARE: 'vs', ARITHMETIC: '+', ADD: '+', SUBTRACT: '-', DIVIDE: '÷' };
+            return symbols[op] || '→';
+        }
+
+        // Initialize
+        loadDashboardData();
+    </script>
+</body>
+</html>
