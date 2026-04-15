@@ -1,9 +1,16 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useGoogleAuth } from '../context/GoogleAuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  // Check both auth systems
+  const googleAuth = useGoogleAuth();
+  const oldAuth = useAuth();
+  
+  // Use Google auth if available, otherwise use old auth
+  const auth = googleAuth.isAuthenticated ? googleAuth : oldAuth;
+  const { isAuthenticated, loading } = auth;
 
   // Show loading spinner while checking authentication
   if (loading) {

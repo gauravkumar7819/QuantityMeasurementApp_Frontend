@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://quantitymeasurementapp-r3mu.onrender.com/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,9 +10,15 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
+// Add JWT token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  // Check both old token and new JWT token
+  const oldToken = localStorage.getItem('token');
+  const newToken = authService.getToken();
+  
+  // Use new token if available, otherwise use old token
+  const token = newToken || oldToken;
+  
   if (token && token !== 'undefined' && token !== 'null') {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -28,6 +35,8 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors (token expired or invalid)
     if (error.response?.status === 401) {
+      // Clear both auth systems
+      authService.logout();
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       
@@ -45,23 +54,40 @@ api.interceptors.response.use(
 export const authAPI = {
   register: async (name, email, password) => {
     try {
+      console.log('[API] Register request:', { name, email, password: '***' });
       const response = await api.post('/Auth/register', { name, email, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      console.log('[API] Register response:', response.data);
+      
+      // Handle both token and jwtToken in response
+      const token = response.data.token || response.data.jwtToken;
+      
+      if (token) {
+        localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Registration failed' };
+      console.error('[API] Register error:', error.response?.data);
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.response?.data?.title ||
+                          JSON.stringify(error.response?.data) ||
+                          'Registration failed';
+      return { success: false, error: errorMessage };
     }
   },
   
   login: async (email, password) => {
     try {
+      console.log('[API] Login request:', { email, password: '***' });
       const response = await api.post('/Auth/login', { email, password });
+      console.log('[API] Login response:', response.data);
       
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      // Handle both token and jwtToken in response
+      const token = response.data.token || response.data.jwtToken;
+      
+      if (token) {
+        localStorage.setItem('token', token);
         
         // Handle user data - some APIs return user in response, others don't
         if (response.data.user) {
@@ -87,7 +113,13 @@ export const authAPI = {
         return { success: false, error: 'Login response missing token' };
       }
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Login failed' };
+      console.error('[API] Login error:', error.response?.data);
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.response?.data?.title ||
+                          JSON.stringify(error.response?.data) ||
+                          'Login failed';
+      return { success: false, error: errorMessage };
     }
   },
   
@@ -301,44 +333,21 @@ export const quantityAPI = {
   },
 };
 
-// Measurements API for history
+// Measurements API for history - DISABLED (backend doesn't support history endpoints)
 export const measurementsAPI = {
   getMeasurements: async () => {
-    try {
-      const response = await api.get('/Quantity/history');
-      return response.data || [];
-    } catch (error) {
-      return [];
-    }
+    // History feature not supported by backend
+    return [];
   },
   
   saveMeasurement: async (measurement) => {
-    try {
-      // Map frontend data structure to backend expected structure
-      const backendMeasurement = {
-        operation: measurement.operation?.toLowerCase(),
-        inputValue1: parseFloat(measurement.details?.match(/[\d.]+/)?.[0] || 1),
-        inputUnit1: measurement.details?.match(/([A-Z]+)/)?.[1] || 'INCHES',
-        inputValue2: null,
-        inputUnit2: null,
-        resultValue: parseFloat(measurement.result?.match(/[\d.]+/)?.[0] || 1),
-        resultUnit: measurement.result?.match(/([A-Z]+)/)?.[1] || 'INCHES'
-      };
-      
-      const response = await api.post('/Quantity/history', backendMeasurement);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    // History feature not supported by backend
+    throw new Error('History feature is not available');
   },
   
   deleteMeasurement: async (id) => {
-    try {
-      const response = await api.delete(`/Quantity/history/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    // History feature not supported by backend
+    throw new Error('History feature is not available');
   },
 };
 

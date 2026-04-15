@@ -1,17 +1,79 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useGoogleAuth } from '../context/GoogleAuthContext';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  // Check both auth systems
+  const googleAuth = useGoogleAuth();
+  const oldAuth = useAuth();
+  
+  // Use Google auth if available, otherwise use old auth
+  const auth = googleAuth.isAuthenticated ? googleAuth : oldAuth;
+  const { user, logout } = auth;
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      logout();
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      {/* User Profile Card */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          {/* Profile Image */}
+          <div className="flex-shrink-0">
+            {user?.picture ? (
+              <img
+                src={user.picture}
+                alt={user.name || 'User'}
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-100 shadow-md"
+              />
+            ) : (
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-4xl sm:text-5xl text-white font-bold border-4 border-blue-100 shadow-md">
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
+          </div>
+
+          {/* User Info */}
+          <div className="flex-1 text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              {user?.name || 'User'}
+            </h1>
+            <p className="text-gray-600 mb-4">{user?.email || 'No email provided'}</p>
+            <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
+
+          {/* Account Status */}
+          <div className="flex-shrink-0 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-green-700">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Authenticated</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Welcome Header */}
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-          Welcome back, <span className="text-blue-600">{user?.name || 'User'}</span>!
-        </h1>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          Welcome to Your Dashboard
+        </h2>
         <p className="text-gray-600 text-sm sm:text-base">Your measurement dashboard</p>
       </div>
 
