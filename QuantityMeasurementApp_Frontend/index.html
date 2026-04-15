@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="UnitMaster - Your complete measurement solution. Convert between units with precision and ease.">
+    <meta name="keywords" content="unit converter, measurement converter, length converter, weight converter, temperature converter">
+    <meta name="author" content="UnitMaster Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="UnitMaster - Measurement Converter">
+    <meta property="og:description" content="Convert between units with precision and ease">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📏</text></svg>">
+    
+    <title>UnitMaster - Measurement App</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="navbar.html" as="fetch">
+    <link rel="preload" href="app.js" as="script">
+</head>
+<body>
+
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navbar will load here -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <section class="hero-section">
+            <h1 class="hero-title">Welcome to UnitMaster</h1>
+            <p class="hero-subtitle">
+                Your complete measurement solution - Convert, calculate, and compare units with precision and ease
+            </p>
+            <div class="hero-actions">
+                <a href="signup.html" class="cta-button" aria-label="Get started with UnitMaster">Get Started →</a>
+                <a href="converter.html" class="btn-secondary">Try Converter</a>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="features-grid-home">
+                <div class="feature-card-home">
+                    <div class="feature-icon-home">🔄</div>
+                    <h3 class="feature-title-home">Real-time Conversion</h3>
+                    <p class="feature-desc-home">Convert between units instantly as you type</p>
+                </div>
+                <div class="feature-card-home">
+                    <div class="feature-icon-home">📊</div>
+                    <h3 class="feature-title-home">Multiple Categories</h3>
+                    <p class="feature-desc-home">Length, weight, temperature, volume, and more</p>
+                </div>
+                <div class="feature-card-home">
+                    <div class="feature-icon-home">📱</div>
+                    <h3 class="feature-title-home">Mobile Friendly</h3>
+                    <p class="feature-desc-home">Works perfectly on all devices</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 UnitMaster. Made with ❤️ for precision and simplicity.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
