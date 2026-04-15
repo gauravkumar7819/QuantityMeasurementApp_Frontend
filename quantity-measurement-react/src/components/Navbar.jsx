@@ -26,7 +26,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="text-xl font-bold text-blue-600">
-              📏 UnitMaster
+              📏 {import.meta.env.VITE_APP_NAME || 'UnitMaster'}
             </Link>
 
             {/* Desktop Menu */}

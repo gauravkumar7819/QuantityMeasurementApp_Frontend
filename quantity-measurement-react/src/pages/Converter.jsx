@@ -26,9 +26,6 @@ const Converter = () => {
     volume: '🧪'
   };
   
-  const getCategoryIcon = (category) => {
-    return icons[category] || '📊';
-  };
 
   const saveToHistory = async () => {
     if (result === '--' || result === 'Error') {
@@ -58,7 +55,7 @@ const Converter = () => {
       
       // Hide success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
+    } catch {
       setError('Failed to save calculation to history');
     } finally {
       setSaveLoading(false);
@@ -87,12 +84,12 @@ const Converter = () => {
     return `${value1} ${unit1}`;
   };
 
-  // Units matching .NET backend ENUMs (uppercase)
+  // Units matching backend API expectations (lowercase)
   const units = {
-    length: ['INCHES', 'FEET', 'YARDS', 'CENTIMETERS'],
-    weight: ['KILOGRAM', 'GRAM', 'POUND'],
-    temperature: ['CELSIUS', 'FAHRENHEIT', 'KELVIN'],
-    volume: ['LITRE', 'MILLILITRE', 'GALLON']
+    length: ['inches', 'feet', 'yards', 'centimeters'],
+    weight: ['kilogram', 'gram', 'pound'],
+    temperature: ['celsius', 'fahrenheit', 'kelvin'],
+    volume: ['litre', 'millilitre', 'gallon']
   };
 
   // Initialize units when category changes
@@ -354,7 +351,7 @@ const Converter = () => {
       )}
 
       {/* Result Display */}
-      <div className="bg-linear-to-r from-blue-600 to-blue-700 rounded-lg shadow p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow p-6 text-white">
         <div className="text-sm opacity-80 mb-2">Result</div>
         <div className="text-2xl sm:text-3xl font-bold break-all">
           {loading ? 'Calculating...' : result}

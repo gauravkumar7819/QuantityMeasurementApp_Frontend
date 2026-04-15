@@ -3,12 +3,12 @@ import React from 'react';
 const About = () => {
   return (
     <main className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">About UnitMaster</h1>
+      <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">About {import.meta.env.VITE_APP_NAME || 'UnitMaster'}</h1>
       
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Our Mission</h2>
         <p className="text-gray-600 leading-relaxed">
-          UnitMaster makes unit conversions simple, accurate, and accessible for students, professionals, 
+          {import.meta.env.VITE_APP_NAME || 'UnitMaster'} makes unit conversions simple, accurate, and accessible for students, professionals, 
           and everyday users. Convert, compare, and calculate measurements across multiple categories with ease.
         </p>
       </section>

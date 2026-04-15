@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5084/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://quantitymeasurementapp-r3mu.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -164,7 +164,8 @@ export const quantityAPI = {
         q2: {
           value: parseFloat(value2),
           unit: unit2
-        }
+        },
+        targetUnit: unit1
       };
       
       const response = await api.post('/Quantity/compare', request);
@@ -262,18 +263,28 @@ export const quantityAPI = {
         q2: {
           value: parseFloat(value2),
           unit: unit2
-        }
+        },
+        targetUnit: unit1
       };
       
-      console.log('📤 Sending divide request:', JSON.stringify(request, null, 2));
+      // Only log in debug mode
+      if (import.meta.env.VITE_DEBUG === 'true') {
+        console.log('📤 Sending divide request:', JSON.stringify(request, null, 2));
+      }
       
       const response = await api.post('/Quantity/divide', request);
       
-      console.log('✅ Divide response:', JSON.stringify(response.data, null, 2));
+      // Only log in debug mode
+      if (import.meta.env.VITE_DEBUG === 'true') {
+        console.log('✅ Divide response:', JSON.stringify(response.data, null, 2));
+      }
       
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('❌ Divide error:', error.response?.status, error.response?.data);
+      // Only log errors in debug mode
+      if (import.meta.env.VITE_DEBUG === 'true') {
+        console.error('❌ Divide error:', error.response?.status, error.response?.data);
+      }
       
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
