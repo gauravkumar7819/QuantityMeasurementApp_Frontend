@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useGoogleAuth } from "../context/GoogleAuthContext";
 
 const Navbar = () => {
-  const { logout, isAuthenticated, user, loading } = useAuth();
+  // Check both auth systems
+  const googleAuth = useGoogleAuth();
+  const oldAuth = useAuth();
+  
+  // Determine which auth system to use based on authentication state
+  const isGoogleAuth = googleAuth.isAuthenticated;
+  const isOldAuth = oldAuth.isAuthenticated;
+  const isEitherAuth = isGoogleAuth || isOldAuth;
+  
+  // Use the authenticated system, or default to old auth
+  const auth = isGoogleAuth ? googleAuth : (isOldAuth ? oldAuth : oldAuth);
+  const { logout, isAuthenticated, user, loading: authLoading } = auth;
+  
+  // Combined loading state
+  const loading = authLoading || (googleAuth.loading && !googleAuth.isAuthenticated);
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

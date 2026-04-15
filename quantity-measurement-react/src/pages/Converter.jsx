@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { quantityAPI, measurementsAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { quantityAPI } from '../services/api';
 
 const Converter = () => {
-  const { isAuthenticated } = useAuth();
   const [category, setCategory] = useState('length');
   const [action, setAction] = useState('CONVERT');
   const [operation, setOperation] = useState('ADD');
@@ -15,8 +13,6 @@ const Converter = () => {
   const [result, setResult] = useState('--');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const categories = ['length', 'weight', 'temperature', 'volume'];
   const icons = {
@@ -26,63 +22,6 @@ const Converter = () => {
     volume: '🧪'
   };
   
-
-  const saveToHistory = async () => {
-    if (result === '--' || result === 'Error') {
-      setError('Please perform a calculation before saving to history');
-      return;
-    }
-
-    if (!isAuthenticated) {
-      setError('Please log in to save calculations to history');
-      return;
-    }
-
-    try {
-      setSaveLoading(true);
-      setSaveSuccess(false);
-      
-      const measurement = {
-        category: category,
-        operation: getOperationDescription(),
-        details: getCalculationDetails(),
-        result: result,
-        createdAt: new Date().toISOString()
-      };
-      
-      await measurementsAPI.saveMeasurement(measurement);
-      setSaveSuccess(true);
-      
-      // Hide success message after 3 seconds
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch {
-      setError('Failed to save calculation to history');
-    } finally {
-      setSaveLoading(false);
-    }
-  };
-
-  const getOperationDescription = () => {
-    if (action === 'CONVERT') {
-      return 'Convert';
-    } else if (action === 'COMPARE') {
-      return 'Compare';
-    } else if (action === 'ARITHMETIC') {
-      return operation;
-    }
-    return action;
-  };
-
-  const getCalculationDetails = () => {
-    if (action === 'CONVERT') {
-      return `${value1} ${unit1} → ${resultUnit}`;
-    } else if (action === 'COMPARE') {
-      return `${value1} ${unit1} vs ${value2} ${unit2}`;
-    } else if (action === 'ARITHMETIC') {
-      return `${value1} ${unit1} ${operation} ${value2} ${unit2}`;
-    }
-    return `${value1} ${unit1}`;
-  };
 
   // Units matching backend API expectations (lowercase)
   const units = {
@@ -248,13 +187,6 @@ const Converter = () => {
         </div>
       )}
 
-      {saveSuccess && (
-        <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm">
-          <strong>Success:</strong> Calculation saved to history!
-        </div>
-      )}
-
-
       {/* Categories */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
         {categories.map(cat => (
@@ -356,50 +288,6 @@ const Converter = () => {
         <div className="text-2xl sm:text-3xl font-bold break-all">
           {loading ? 'Calculating...' : result}
         </div>
-        
-        {/* Save to History Button */}
-        {result !== '--' && result !== 'Error' && (
-          <div className="mt-4 pt-4 border-t border-blue-500">
-            {isAuthenticated ? (
-              <button
-                onClick={saveToHistory}
-                disabled={saveLoading}
-                className="w-full bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {saveLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <span>📊</span>
-                    Save to History
-                  </>
-                )}
-              </button>
-            ) : (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium text-blue-800">
-                      📊 Save to History
-                    </div>
-                    <div className="text-xs text-blue-600">
-                      Log in to save your calculations
-                    </div>
-                  </div>
-                  <a
-                    href="/login"
-                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
-                  >
-                    Login
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
